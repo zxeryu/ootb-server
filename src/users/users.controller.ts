@@ -1,6 +1,18 @@
-import { Controller, Get, HttpStatus, Post, Response, Param, Body, HttpException } from '@nestjs/common';
-import {CreateUserDto} from './dto/CreateUserDto';
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  Post,
+  Response,
+  Param,
+  Body,
+  HttpException,
+   UsePipes,
+} from '@nestjs/common';
+import {CreateUserDto} from './dto/create-user.dto';
 import { UsersService } from './users.service';
+import { UserValidationPipe } from './pipe/user-validate.pipe';
+import { CustomParseIntPipe } from './pipe/custom-parse-int.pipe';
 
 @Controller('users')
 export class UsersController {
@@ -20,7 +32,7 @@ export class UsersController {
   }
 
   @Get('/:id')
-  async getUser(@Param('id') id,@Response() res){
+  async getUser(@Param('id',new CustomParseIntPipe()) id, @Response() res){
     try {
       const user = await this.usersService.getUser(id);
       res.status(HttpStatus.OK).json(user);
@@ -30,6 +42,7 @@ export class UsersController {
   }
 
   @Post()
+  @UsePipes(UserValidationPipe)
   addUser(@Response() res,@Body() createUserDto:CreateUserDto){
     this.usersService.addUser(createUserDto);
     res.status(HttpStatus.OK).json({});

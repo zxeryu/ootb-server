@@ -1,6 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import {filter} from 'lodash';
-import { CreateUserDto } from './dto/CreateUserDto';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -13,7 +13,7 @@ export class UsersService {
   }
   getUser(id:number){
     const users = filter(this.users,(u)=>{
-      return u.id == id;
+      return u.id === id;
     });
     if(!users || users.length<=0){
       throw new HttpException('user not found',404);
