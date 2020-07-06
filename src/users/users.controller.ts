@@ -7,45 +7,46 @@ import {
   Param,
   Body,
   HttpException,
-   UsePipes,
-} from '@nestjs/common';
-import {CreateUserDto} from './dto/create-user.dto';
-import { UsersService } from './users.service';
-import { UserValidationPipe } from './pipe/user-validate.pipe';
-import { CustomParseIntPipe } from './pipe/custom-parse-int.pipe';
+  UsePipes,
+  UseGuards,
+} from "@nestjs/common";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UsersService } from "./users.service";
+import { UserValidationPipe } from "./pipe/user-validate.pipe";
+import { CustomParseIntPipe } from "./pipe/custom-parse-int.pipe";
+import { RolesGuard } from "../guards/roles.guard.";
+import { Roles } from "../decorator/roles.decorator";
 
-@Controller('users')
+@Controller("users")
+@UseGuards(RolesGuard)
 export class UsersController {
-
-  constructor(private usersService:UsersService) {
-  }
-
+  constructor(private usersService: UsersService) {}
 
   @Get()
-  async getAllUsers(@Response() res){
+  @Roles("admin")
+  async getAllUsers(@Response() res) {
     try {
       const users = await this.usersService.getAllUsers();
-       res.status(HttpStatus.OK).json(users);
+      res.status(HttpStatus.OK).json(users);
     } catch (e) {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({});
     }
   }
 
-  @Get('/:id')
-  async getUser(@Param('id',new CustomParseIntPipe()) id, @Response() res){
+  @Get("/:id")
+  async getUser(@Param("id", new CustomParseIntPipe()) id, @Response() res) {
     try {
       const user = await this.usersService.getUser(id);
       res.status(HttpStatus.OK).json(user);
     } catch (e) {
-      throw new HttpException('user not found',HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException("user not found", HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
   @Post()
   @UsePipes(UserValidationPipe)
-  addUser(@Response() res,@Body() createUserDto:CreateUserDto){
+  addUser(@Response() res, @Body() createUserDto: CreateUserDto) {
     this.usersService.addUser(createUserDto);
     res.status(HttpStatus.OK).json({});
   }
-
 }
