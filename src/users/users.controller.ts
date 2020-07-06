@@ -9,6 +9,7 @@ import {
   HttpException,
   UsePipes,
   UseGuards,
+  UseInterceptors,
 } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UsersService } from "./users.service";
@@ -16,9 +17,12 @@ import { UserValidationPipe } from "./pipe/user-validate.pipe";
 import { CustomParseIntPipe } from "./pipe/custom-parse-int.pipe";
 import { RolesGuard } from "../guards/roles.guard.";
 import { Roles } from "../decorator/roles.decorator";
+import { LoggingInterceptor } from "../interceptor/logging.interceptor";
+import { TransformInterceptor } from "../interceptor/transform.interceptor";
 
 @Controller("users")
 @UseGuards(RolesGuard)
+@UseInterceptors(LoggingInterceptor)
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
@@ -31,6 +35,12 @@ export class UsersController {
     } catch (e) {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({});
     }
+  }
+
+  @Get("testTransformInterceptor")
+  @UseInterceptors(TransformInterceptor)
+  async testTransformInterceptor() {
+    return "test response";
   }
 
   @Get("/:id")
