@@ -27,7 +27,7 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get()
-  @Roles("admin")
+  // @Roles("admin")
   async getAllUsers(@Response() res) {
     try {
       const users = await this.usersService.getAllUsers();
