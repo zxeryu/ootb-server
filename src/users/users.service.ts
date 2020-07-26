@@ -1,14 +1,15 @@
 import { HttpException, Injectable } from "@nestjs/common";
-import { filter, times, map } from "lodash";
+import { filter, times, map, slice } from "lodash";
 import { CreateUserDto } from "./dto/create-user.dto";
 
 @Injectable()
 export class UsersService {
-  private users: CreateUserDto[] = map(times(10), (_, index) => {
+  private users: CreateUserDto[] = map(times(100), (_, index) => {
     return { id: index, name: "user" + index, age: index * 10 + "" };
   });
-  getAllUsers() {
-    return Promise.resolve(this.users);
+  getAllUsers(page: number, pageSize: number) {
+    const start = (page - 1) * pageSize;
+    return Promise.resolve(slice(this.users, start, start + pageSize));
   }
   getUser(id: number) {
     const users = filter(this.users, (u) => {

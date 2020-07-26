@@ -6,10 +6,12 @@ import {
   Response,
   Param,
   Body,
+  Query,
   HttpException,
   UsePipes,
   UseGuards,
   UseInterceptors,
+  ParseIntPipe,
 } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UsersService } from "./users.service";
@@ -28,9 +30,14 @@ export class UsersController {
 
   @Get()
   // @Roles("admin")
-  async getAllUsers(@Response() res) {
+  async getAllUsers(
+    @Response() res,
+    @Query("page", new ParseIntPipe()) page,
+    @Query("pageSize", new ParseIntPipe()) pageSize,
+  ) {
+    console.log("@@@@@@@@@@", page, pageSize);
     try {
-      const users = await this.usersService.getAllUsers();
+      const users = await this.usersService.getAllUsers(page, pageSize);
       res.status(HttpStatus.OK).json(users);
     } catch (e) {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({});
